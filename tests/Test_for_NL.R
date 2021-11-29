@@ -33,16 +33,16 @@ for(i in dirs){
 }
 
 
-test_dir <- "D:/ARU_TEST_DIRECTORIES/P01/P01_1"
+# test_dir <- "D:/ARU_TEST_DIRECTORIES/P01/P01_1"
 options(readr.read_lazy = TRUE)
 
 ## Clean for selection
 
-test <- clean_metadata("BarLT", test_dir, "P01_1")
+# test <- clean_metadata("BarLT", test_dir, "P01_1")
 parms_ <- list(min_range = c(-60, 300),
                doy_range = c(150, 350),
                mean_min = 30, sd_min = 30,
-               mean_doy = 0, sd_doy = 10,off=0,
+               mean_doy = 250, sd_doy = 10,off=0,
                log_ = FALSE, fun = "norm")
 
 loc_dirs <-  list.dirs("D:/ARU_TEST_DIRECTORIES", recursive = T)
@@ -50,23 +50,17 @@ loc_dirs <- loc_dirs[grepl("_\\d$", loc_dirs)]
 
 
 
-test_si <- calc_sel_pr(test, ARU_ID_col = SiteID, min_col = t2sr_min, day_col = doy, parms = parms_)
+# test_si <- calc_sel_pr(test, ARU_ID_col = SiteID, min_col = t2sr_min, day_col = doy, parms = parms_)
 all_directories_data <- purrr::map_df(loc_dirs, ~clean_metadata(type = "BarLT", .x ,
                                                                stringr::str_extract(.x, "P\\d\\d_\\d")))
 
 full_si <- calc_sel_pr(all_directories_data,
                        ARU_ID_col = SiteID, min_col = t2sr_min, day_col = doy, parms = parms_)
 
-
+options(error=browser)
 grts_selction <- fun_aru_samp(full_si[full_si$psel_std>0,], N = 10, os = 0,
                               strat_ = "SiteID",
                               seed = 65461, selprob_id = "psel_std",
                               x = 'doy',y = 't2sr')
 
 
-fun_aru_samp(df = grts_selction[grts_selction$psel_std>0,],
-             N = 12, os =0.2,
-             seed = 5735779,
-             strat_ = "ARU_ID",
-             selprob_id = "psel_tod", x = 'doy', y = 't2sr'
-)
