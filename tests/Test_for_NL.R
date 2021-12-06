@@ -48,14 +48,27 @@ parms_ <- list(min_range = c(-60, 300),
 loc_dirs <-  list.dirs("D:/ARU_TEST_DIRECTORIES", recursive = T)
 loc_dirs <- loc_dirs[grepl("_\\d$", loc_dirs)]
 
+#
+# weather_data <-
+#   weathercan::weather_dl(station_ids = c(52898, 10244),
+#                          start = "2021-04-15",
+#                          end = "2021-10-15", interval = 'hour')
+#
+# library(tidyverse)
+#
+# ggplot(weather_data, aes(date, wind_spd)) + geom_point() +
+#   geom_smooth() +
+#   facet_wrap(~station_name)
+#
+# # test_si <- calc_sel_pr(test, ARU_ID_col = SiteID, min_col = t2sr_min, day_col = doy, parms = parms_)
+# all_directories_data <- purrr::map_df(loc_dirs, ~clean_metadata(type = "BarLT", .x ,
+#                                                                stringr::str_extract(.x, "P\\d\\d_\\d")))
+#
+# full_si <- calc_sel_pr(all_directories_data,
+#                        ARU_ID_col = SiteID, min_col = t2sr_min, day_col = doy, parms = parms_)
 
 
-# test_si <- calc_sel_pr(test, ARU_ID_col = SiteID, min_col = t2sr_min, day_col = doy, parms = parms_)
-all_directories_data <- purrr::map_df(loc_dirs, ~clean_metadata(type = "BarLT", .x ,
-                                                               stringr::str_extract(.x, "P\\d\\d_\\d")))
 
-full_si <- calc_sel_pr(all_directories_data,
-                       ARU_ID_col = SiteID, min_col = t2sr_min, day_col = doy, parms = parms_)
 
 options(error=browser)
 grts_selction <- fun_aru_samp(full_si[full_si$psel_std>0,], N = 10, os = 0,

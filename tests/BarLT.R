@@ -14,6 +14,15 @@ gps_log <- readr::read_csv(glue::glue("{folder_base}{list_files[grepl('GPS_log',
                            skip = 1, col_names = T) %>%
   janitor::clean_names()
 
+purrr::map(list_waves[2:10],~soxSpectrogram(sox.file.path = "C:/Program Files (x86)/sox-14-4-2/sox.exe",
+               file.path =  paste0(folder_base, "/", .x),
+               out.path = "D:/!_TEMP_AUDIO_SAMPLES/Spect"))
+windY <- "D:/!_TEMP_AUDIO_SAMPLES/ARU_RecordingSample_P7-04/20211005_NapkenLk_duskdawn/20211005T124200-0400_SR.wav"
+soxSpectrogram(sox.file.path = "C:/Program Files (x86)/sox-14-4-2/sox.exe",
+               file.path =  windY,
+               out.path = "D:/!_TEMP_AUDIO_SAMPLES/Spect")
+t1 <- getvals(filename = list_waves[[1]], fl = folder_base)
+t2 <- getvals(filename = windY, fl = "")
 
 
 rec_log <- readr::read_csv(glue::glue("{folder_base}{list_files[grepl('Reclog', list_files)]}"),
