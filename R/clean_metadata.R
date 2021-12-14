@@ -35,7 +35,8 @@ clean_metadata <- function(type, folder_base, sitename ){
                                skip = 1, col_names = T, col_types = readr::cols()) |>
       janitor::clean_names()
 
-    gps_loc <- gps_log[(gps_log$dd_mm_yy %in% rec_log$date_dd_mm_yyyy)|(gps_log$dd_mm_yy %in% (rec_log$date_dd_mm_yyyy+1)) ,]
+    # gps_loc <- gps_log[(gps_log$dd_mm_yy %in% rec_log$date_dd_mm_yyyy)|(gps_log$dd_mm_yy %in% (rec_log$date_dd_mm_yyyy+1)) ,]
+    gps_loc <- gps_log[nrow(gps_log) ,]
     if(nrow(gps_loc)>1) warning("Multple GPS locations. Please check")
     if(nrow(gps_loc)==0) simpleError("GPS location did not pull.")
 
