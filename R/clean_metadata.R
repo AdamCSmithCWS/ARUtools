@@ -18,7 +18,7 @@ clean_metadata <- function(type, folder_base, sitename ){
         purrr::flatten_chr()
     list_files <- list.files(folder_base, recursive = T, full.names = F, include.dirs = F)
     list_waves <- list.files(folder_base, pattern = ".wav", recursive = T)
-    if(length(list_waves)==0){return(tibble(SiteID = sitename))}
+    if(length(list_waves)==0){return(tibble::tibble(SiteID = sitename))}
     serial_number <- readr::read_table(glue::glue("{folder_base}/logfile.txt"),skip = 3,col_names = F,
                                 col_types = "ccc",
 
