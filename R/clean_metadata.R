@@ -1,3 +1,11 @@
+#' Clean aru metadata
+#'
+#' @param type BarLT or SM4
+#' @param folder_base Folder base directory
+#' @param sitename  Site name
+#'
+#' @return
+#' @export
 clean_metadata <- function(type, folder_base, sitename ){
   if(type == "BarLT"){
     ## Testing Bar-LT data
