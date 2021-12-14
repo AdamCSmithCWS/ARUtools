@@ -15,7 +15,7 @@ Imports:
     patchwork,
     ggplot2,
     rlang (>= 0.4),
-    spsurvey (>= 5.0.1)
+    spsurvey (>= 5.0.1),
     lutz
 Suggests: 
     testthat (>= 3.0.0)
