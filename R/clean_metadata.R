@@ -18,11 +18,12 @@ clean_metadata <- function(type, folder_base, sitename ){
         purrr::flatten_chr()
     list_files <- list.files(folder_base, recursive = T, full.names = F, include.dirs = F)
     list_waves <- list.files(folder_base, pattern = ".wav", recursive = T)
+    if(length(list_waves)==0){return(tibble(SiteID = sitename))}
     serial_number <- readr::read_table(glue::glue("{folder_base}/logfile.txt"),skip = 3,col_names = F,
                                 col_types = "ccc",
 
                                 n_max = 1) |>
-      dplyr::pull(X3)
+      dplyr::pull(3)
 
 
     gps_log <- readr::read_csv(glue::glue("{folder_base}/{list_files[grepl('GPS_log', list_files)]}"),
@@ -50,7 +51,7 @@ clean_metadata <- function(type, folder_base, sitename ){
     names(rec_log) <- names_fixed
 
     wav_names_log <- tibble::tibble(filename=list_waves) %>%
-      {if(length(stringr::str_split(list_waves[[1]], "/"))==1){
+      {if(length(stringr::str_split(list_waves[[1]], "/")[[1]])==1){
       dplyr::mutate(., WaveFilename=filename)
     } else{
 
@@ -103,6 +104,7 @@ clean_metadata <- function(type, folder_base, sitename ){
                                     lon = gps_loc$longitude_decimal_degrees, tz = tz_loc,
                                     keep = c("sunrise", "sunset"))
 
+    # browser()
 
     rec_log_ss <- wav_names_log |>
       dplyr::left_join(ss, by = "date") |>
