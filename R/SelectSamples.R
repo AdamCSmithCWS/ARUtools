@@ -60,7 +60,7 @@ fun_aru_samp <- function(df, N, os, seed, strat_, selprob_id, x, y) {
   Stratdsgn <- rep(N, length(arus))
 
   n_os <-  round(N*os)
-  names(Stratdsgn) <- names(n_os) <- arus
+  names(Stratdsgn) <- arus
 
 
 
