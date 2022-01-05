@@ -15,7 +15,10 @@ Imports:
     patchwork,
     ggplot2,
     rlang (>= 0.4),
-    spsurvey (>= 5.0.1)
+    spsurvey (>= 5.0.1),
+    lutz,
+    suncalc
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+RoxygenNote: 7.1.2

@@ -1,3 +1,11 @@
+#' Clean aru metadata
+#'
+#' @param type BarLT or SM4
+#' @param folder_base Folder base directory
+#' @param sitename  Site name
+#'
+#' @return
+#' @export
 clean_metadata <- function(type, folder_base, sitename ){
   if(type == "BarLT"){
     ## Testing Bar-LT data
@@ -10,11 +18,12 @@ clean_metadata <- function(type, folder_base, sitename ){
         purrr::flatten_chr()
     list_files <- list.files(folder_base, recursive = T, full.names = F, include.dirs = F)
     list_waves <- list.files(folder_base, pattern = ".wav", recursive = T)
+    if(length(list_waves)==0){return(tibble::tibble(SiteID = sitename))}
     serial_number <- readr::read_table(glue::glue("{folder_base}/logfile.txt"),skip = 3,col_names = F,
                                 col_types = "ccc",
 
                                 n_max = 1) |>
-      dplyr::pull(X3)
+      dplyr::pull(3)
 
 
     gps_log <- readr::read_csv(glue::glue("{folder_base}/{list_files[grepl('GPS_log', list_files)]}"),
@@ -23,24 +32,26 @@ clean_metadata <- function(type, folder_base, sitename ){
 
 
 
-    rec_log <- readr::read_csv(glue::glue("{folder_base}/{list_files[grepl('Reclog', list_files)]}"),
-                               skip = 1, col_names = T, col_types = readr::cols()) |>
-      janitor::clean_names()
+    # rec_log <- readr::read_csv(glue::glue("{folder_base}/{list_files[grepl('Reclog', list_files)]}"),
+    #                            skip = 1, col_names = T, col_types = readr::cols()) |>
+    #   janitor::clean_names()
 
-    gps_loc <- gps_log[gps_log$dd_mm_yy %in% rec_log$date_dd_mm_yyyy,]
+    # gps_loc <- gps_log[(gps_log$dd_mm_yy %in% rec_log$date_dd_mm_yyyy)|(gps_log$dd_mm_yy %in% (rec_log$date_dd_mm_yyyy+1)) ,]
+    gps_loc <- gps_log[nrow(gps_log) ,]
     if(nrow(gps_loc)>1) warning("Multple GPS locations. Please check")
+    if(nrow(gps_loc)==0) simpleError("GPS location did not pull.")
 
     tz_loc <- lutz::tz_lookup_coords(lat = gps_loc$latitude_decimal_degrees,
                                      lon = gps_loc$longitude_decimal_degrees,
                                      method = 'accurate')
     # browser()
     #FixNames - Currently gain is a single column tidyr::separated by
-    names_err <- names(rec_log)
-    names_fixed <- c(names_err[1:4], "gain_db_A","gain_db_B", names_err[6:15])
-    names(rec_log) <- names_fixed
+    # names_err <- names(rec_log)
+    # names_fixed <- c(names_err[1:4], "gain_db_A","gain_db_B", names_err[6:15])
+    # names(rec_log) <- names_fixed
 
     wav_names_log <- tibble::tibble(filename=list_waves) %>%
-      {if(length(stringr::str_split(list_waves[[1]], "/"))==1){
+      {if(length(stringr::str_split(list_waves[[1]], "/")[[1]])==1){
       dplyr::mutate(., WaveFilename=filename)
     } else{
 
@@ -71,19 +82,19 @@ clean_metadata <- function(type, folder_base, sitename ){
 
 
 
-    rec_log_clean <- rec_log |>
-      dplyr::mutate(date = lubridate::dmy(date_dd_mm_yyyy),
-             time = lubridate::hms(time_hh_mm_ss),
-             date_time = lubridate::dmy_hms(glue::glue("{date_dd_mm_yyyy} {time_hh_mm_ss}"), tz = tz_loc),
-             free_space_gb = dplyr::case_when(
-               grepl("GB$", free_space)~as.numeric(stringr::str_remove(free_space,"[A-Z]+")),
-               grepl("MB$", free_space)~as.numeric(stringr::str_remove(free_space,"[A-Z]+"))*0.001,
-               TRUE~as.numeric(free_space)*1.25e-10),
-             p_Battery_Cap = as.numeric(stringr::str_remove(percent_full, "\\%"))/100,
-             day_before = date-1,
-             day_after=date+1
-
-      )
+    # rec_log_clean <- rec_log |>
+    #   dplyr::mutate(date = lubridate::dmy(date_dd_mm_yyyy),
+    #          time = lubridate::hms(time_hh_mm_ss),
+    #          date_time = lubridate::dmy_hms(glue::glue("{date_dd_mm_yyyy} {time_hh_mm_ss}"), tz = tz_loc),
+    #          free_space_gb = dplyr::case_when(
+    #            grepl("GB$", free_space)~as.numeric(stringr::str_remove(free_space,"[A-Z]+")),
+    #            grepl("MB$", free_space)~as.numeric(stringr::str_remove(free_space,"[A-Z]+"))*0.001,
+    #            TRUE~as.numeric(free_space)*1.25e-10),
+    #          p_Battery_Cap = as.numeric(stringr::str_remove(percent_full, "\\%"))/100,
+    #          day_before = date-1,
+    #          day_after=date+1
+    #
+    #   )
 
     # browser()
 
@@ -93,6 +104,7 @@ clean_metadata <- function(type, folder_base, sitename ){
                                     lon = gps_loc$longitude_decimal_degrees, tz = tz_loc,
                                     keep = c("sunrise", "sunset"))
 
+    # browser()
 
     rec_log_ss <- wav_names_log |>
       dplyr::left_join(ss, by = "date") |>
