@@ -53,13 +53,13 @@ fun_aru_samp <- function(df, N, os, seed, strat_, selprob_id, x, y) {
   }
   if(packageVersion("spsurvey")>=5){
   sf_df <- df %>%
-      sf::st_as_sf(coords = c(x,y), crs = 3395)
+      sf::st_as_sf(coords = c(paste0(x),paste0(y)), crs = 3395)
 
   # browser()
 
   Stratdsgn <- rep(N, length(arus))
 
-  n_os <-  rep(round(N*os), length(arus))
+  n_os <-  round(N*os)
   names(Stratdsgn) <- names(n_os) <- arus
 
 
