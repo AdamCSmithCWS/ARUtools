@@ -65,9 +65,9 @@ fun_aru_samp <- function(df, N, os, seed, strat_, selprob_id, x, y) {
 
 
   set.seed(seed)
-  samp <- spsurvey::grts(sframe = sf_df,n_over = n_os,
+  samp <- spsurvey::grts(sframe = sf_df,n_over = paste(n_os),
                          n_base = Stratdsgn,
-                         stratum_var = strat_,
+                         stratum_var = paste0(strat_),
                          # caty_n = stratum_var,
                          aux_var =  selprob_id)
 
