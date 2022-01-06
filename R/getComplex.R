@@ -6,6 +6,9 @@
 #' @param maxf max freqency for complexity
 #' @param units_
 #'
+#' @import soundecology
+#' @import tuneR
+#'
 #' @return
 #' @export
 #'

@@ -1,15 +1,24 @@
-# Functions from Sam Hache to create spectrograms
 
-
-###########################################
-########### Read in Functions #############
-###########################################
-
-####Create spectrogram and save it wherever you want
-###Input must be file with its directory (file.path)
-###Defult will save in Spectrogram folder in the current working directory otherwise specify location (out.path)
-###Size specifies the x and y size of the output in pixels must be list
-###Duration sets the duration of spectrogram default is 3 min and is listed in seconds
+#' Create spectrogram from wave file
+#'
+#'Functions from Sam Hache to create spectrograms
+#'
+#' Create spectrogram and save it wherever you want
+#' Input must be file with its directory (file.path)
+#' Defult will save in Spectrogram folder in the current working directory otherwise specify location (out.path)
+#' Size specifies the x and y size of the output in pixels must be list
+#' Duration sets the duration of spectrogram default is 3 min and is listed in seconds
+#'
+#' @param file.path Input must be file with its directory (file.path)
+#' @param out.path Defult will save in Spectrogram folder in the current working directory otherwise specify location (out.path)
+#' @param out.app
+#' @param size
+#' @param duration
+#' @param sox.file.path
+#'
+#' @return
+#' @export
+#'
 soxSpectrogram <- function(file.path, out.path = "Spectrograms",
                             out.app = "test",
                             size = list(x = 2000, y = 1000), duration = list(start = 0, end = 180), sox.file.path){
