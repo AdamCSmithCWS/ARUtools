@@ -12,7 +12,7 @@
 #' @return A sampling run from grts
 #' @export
 #'
-fun_aru_samp <- function(df, N, os, seed, strat_, selprob_id, x, y) {
+fun_aru_samp <- function(df, N, os, seed, strat_, selprob_id, x, y, ...) {
 
     arus <- df %>%
       dplyr::select({{ strat_ }}) %>%
@@ -56,6 +56,10 @@ fun_aru_samp <- function(df, N, os, seed, strat_, selprob_id, x, y) {
       sf::st_as_sf(coords = c(paste0(x),paste0(y)), crs = 3395)
 
   # browser()
+  mindis <-  NULL
+  maxtry <-  10
+  DesignID <-  "Sample"
+  list2env(list(...))
 
   Stratdsgn <- rep(N, length(arus))
 
@@ -68,7 +72,9 @@ fun_aru_samp <- function(df, N, os, seed, strat_, selprob_id, x, y) {
   set.seed(seed)
   samp <- spsurvey::grts(sframe = sf_df,n_over = n_os,
                          n_base = Stratdsgn,
-                         stratum_var = paste0(strat_),
+                         stratum_var = paste0(strat_),mindis = mindis,
+                         DesignID = DesignID,
+                         maxtry = maxtry,
                          # caty_n = stratum_var,
                          aux_var =  selprob_id)
 
