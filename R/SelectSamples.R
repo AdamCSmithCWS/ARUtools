@@ -62,6 +62,7 @@ fun_aru_samp <- function(df, N, os, seed, strat_, selprob_id, x, y) {
   n_os <-  round(N*os)
   names(Stratdsgn) <- arus
 
+  if(n_os==0) n_os <- NULL
 
 
   set.seed(seed)
