@@ -61,7 +61,7 @@ fun_aru_samp <- function(df, N, os, seed, strat_, selprob_id, x, y, ...) {
   DesignID <-  "Sample"
   list2env(list(...))
 
-  print(c(mindis, maxtr, DesignID))
+  print(c(mindis, maxtry, DesignID))
 
   Stratdsgn <- rep(N, length(arus))
 
