@@ -59,7 +59,7 @@ fun_aru_samp <- function(df, N, os, seed, strat_, selprob_id, x, y, ...) {
   mindis <-  NULL
   maxtry <-  10
   DesignID <-  "Sample"
-  list2env(list(...))
+  list2env(list(...), envir = environment())
 
   print(c(mindis, maxtry, DesignID))
 
