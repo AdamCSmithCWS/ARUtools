@@ -19,11 +19,11 @@ clean_metadata <- function(type, folder_base, sitename ){
     list_files <- list.files(folder_base, recursive = T, full.names = F, include.dirs = F)
     list_waves <- list.files(folder_base, pattern = ".wav", recursive = T)
     if(length(list_waves)==0){return(tibble::tibble(SiteID = sitename))}
-    serial_number <- readr::read_table(glue::glue("{folder_base}/logfile.txt"),skip = 3,col_names = F,
-                                col_types = "ccc",
-
-                                n_max = 1) |>
-      dplyr::pull(3)
+    # serial_number <- readr::read_table(glue::glue("{folder_base}/logfile.txt"),skip = 3,col_names = F,
+    #                             col_types = "ccc",
+    #
+    #                             n_max = 1) |>
+    #   dplyr::pull(3)
 
 
     gps_log <- readr::read_csv(glue::glue("{folder_base}/{list_files[grepl('GPS_log', list_files)]}"),
@@ -49,9 +49,9 @@ clean_metadata <- function(type, folder_base, sitename ){
     # names_err <- names(rec_log)
     # names_fixed <- c(names_err[1:4], "gain_db_A","gain_db_B", names_err[6:15])
     # names(rec_log) <- names_fixed
-
+    ll <- length(stringr::str_split(list_waves[[1]], "/")[[1]])
     wav_names_log <- tibble::tibble(filename=list_waves) %>%
-      {if(length(stringr::str_split(list_waves[[1]], "/")[[1]])==1){
+      {if(ll==1){
       dplyr::mutate(., WaveFilename=filename)
     } else{
 
@@ -127,13 +127,13 @@ clean_metadata <- function(type, folder_base, sitename ){
         t2ss_before = lubridate::int_length(lubridate::interval(sunset_before,date_time))/60,
         t2ss_after = lubridate::int_length(lubridate::interval(sunset_after,date_time))/60,
         doy = lubridate::yday(date)) |>
-      dplyr::rowwise() |>
-      dplyr::mutate(t2sr_min = c(t2sr, t2sr_before, t2sr_after)[which.min(c(abs(t2sr), abs(t2sr_before),
-                                                                     abs(t2sr_after)))],
-             t2ss_min = c(t2ss, t2ss_before, t2ss_after)[which.min(c(abs(t2ss), abs(t2ss_before),
-                                                                     abs(t2ss_after)))],
-
-      ) |> dplyr::ungroup() |>
+      # dplyr::rowwise() |>
+      # dplyr::mutate(t2sr_min = c(t2sr, t2sr_before, t2sr_after)[which.min(c(abs(t2sr), abs(t2sr_before),
+      #                                                                abs(t2sr_after)))],
+      #        t2ss_min = c(t2ss, t2ss_before, t2ss_after)[which.min(c(abs(t2ss), abs(t2ss_before),
+      #                                                                abs(t2ss_after)))],
+      #
+      # ) |> dplyr::ungroup() |>
       dplyr::mutate(
         #   Sample_Group = case_when(
         #   (min_to_Sunrise> -90 & min_to_Sunrise < 5*60)~"Dawn",
