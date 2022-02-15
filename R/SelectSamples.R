@@ -69,7 +69,12 @@ fun_aru_samp <- function(df, N, os, seed, strat_, selprob_id, x, y, ...) {
   if(n_os==0) n_os <- NULL
   } else if ( all(arus %in% names(N)) ){
     Stratdsgn <- N
-    n_os <- lapply(FUN = function(x) x * os, X = N )
+    if(length(os)==1){
+    if(n_os==0){ n_os <- NULL
+    } else  n_os <- lapply(FUN = function(x) x * os, X = N )
+    } else if ( all(arus %in% names(N)) ){
+      n_os <- os
+      } else{simpleError("OS should either be single value or list with all strata ID. Not all Strata found in OS and OS has length >1")}
   } else {simpleError("N should either be single value or list with all strata ID. Not all Strata found in N and N has length >1")}
 
 

@@ -26,7 +26,7 @@ clean_metadata <- function(type, folder_base, sitename ){
       dplyr::pull(3)
 
 
-    gps_log <- readr::read_csv(glue::glue("{folder_base}/{list_files[grepl('GPS_log', list_files)]}"),
+    gps_log <- readr::read_csv(glue::glue("{folder_base}/{list_files[grepl('GPS_log.csv', list_files)]}"),
                                skip = 1, col_names = T, col_types = readr::cols()) |>
       janitor::clean_names()
 
