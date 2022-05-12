@@ -7,6 +7,10 @@
 #' @import spsurvey
 #' @import patchwork
 #' @import ggplot2
+#' @import rlang
+#' @import dplyr
 #' @importFrom magrittr %>%
 #'
-NULL
+"_PACKAGE"
+
+rlang::on_load(rlang::local_use_cli())

@@ -4,7 +4,7 @@
 \alias{fun_aru_samp}
 \title{Run the model function}
 \usage{
-fun_aru_samp(df, N, os, seed, strat_, selprob_id, x, y)
+fun_aru_samp(df, N, os, seed, strat_, selprob_id, x, y, ...)
 }
 \arguments{
 \item{df}{Data frame to use with ARU information and selection probabilities}

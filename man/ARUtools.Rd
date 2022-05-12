@@ -3,6 +3,7 @@
 \docType{package}
 \name{ARUtools}
 \alias{ARUtools}
+\alias{ARUtools-package}
 \title{ARUtools: CWS Ontario Tools for working with ARU files}
 \description{
 ARU tools that some might find useful for working with ARU files.

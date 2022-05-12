@@ -1,0 +1,21 @@
+#' Play random track
+#'
+#' Will play a random track from a wave file in a given folder.
+#'
+#' @param base_folder Base folder path from which to search from.
+#'
+#' @return Will not return anything.
+#' @export
+#'
+play_random_track <- function(base_folder, random_seed = NULL){
+  if(!interactive()) abort("This program does not work outside of an interactive seesion")
+  if(is_null(random_seed)) random_seed <- Sys.time()
+  list_waves <- list.files(folder_base, pattern = ".wav", recursive = T, full.names = T)
+  withr::with_seed(random_seed,
+                   {wav_ <- sample(list_waves, 1)})
+  t <- Sys.time()
+    v <- job::job({tuneR::play(wav_)}, import = c(wav_), packages = c("tuneR"))
+    Sys.sleep(32)
+    message(glue::glue("Playing {wav_}. Enjoy!"))
+    if(Sys.time()-t > 30) rstudioapi::jobRemove(v)
+}

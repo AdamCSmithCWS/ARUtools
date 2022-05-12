@@ -4,14 +4,15 @@
 \alias{clean_metadata}
 \title{Clean aru metadata}
 \usage{
-clean_metadata(type, folder_base, sitename)
+clean_metadata(type, folder_base, gps_locations = NULL, ...)
 }
 \arguments{
 \item{type}{BarLT or SM4}
 
 \item{folder_base}{Folder base directory}
 
-\item{sitename}{Site name}
+\item{gps_locations}{GPS locations in lat/lon format with SiteID
+Must also include timezone (tz) and deploy date.}
 }
 \value{
 
