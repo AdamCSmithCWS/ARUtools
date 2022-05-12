@@ -13,10 +13,18 @@ parse_datetimes_BarLT(
 )
 }
 \arguments{
-\item{tz_loc}{}
+\item{list_waves}{list of wav files to be parsed}
+
+\item{site_pattern}{pattern  in grep to pull site id from path.
+Default is "[P|Q]\\d+_\\d"}
+
+\item{filename_separator}{pattern in grep to separate out WaveFileName.
+Default is "T|\\-|\\_|\\."}
+
+\item{tz_loc}{Time zone for location. Default to "America/Toronto"}
 }
 \value{
-
+Returns a data frame with filenames parsed to date & time.
 }
 \description{
 Parse file names of wave files for dates and times.

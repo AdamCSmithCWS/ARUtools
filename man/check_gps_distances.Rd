@@ -9,12 +9,12 @@ check_gps_distances(gps_log, crs_m = 3161, dist_cutoff = 100)
 \arguments{
 \item{gps_log}{gps log file generated from process_gps_barlt}
 
-\item{crs_m}{CRS for measurment of distances. Should be in meters}
+\item{crs_m}{CRS for measurement of distances. Should be in meters}
 
 \item{dist_cutoff}{Distance cutoff in meters. Can be set to Inf to avoid this check.}
 }
 \value{
-
+Returns a data frame with maximum distances between gps points at site.
 }
 \description{
 Check distances between points from GPS log

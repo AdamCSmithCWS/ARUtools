@@ -4,7 +4,7 @@
 #'
 #' @param base_folder Base folder path from which to search from.
 #'
-#' @return Will not return anything.
+#' @return Will not return anything. It does open your media player
 #' @export
 #'
 play_random_track <- function(base_folder, random_seed = NULL){

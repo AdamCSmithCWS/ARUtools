@@ -7,10 +7,14 @@
 process_gps_barlt(base_folder, file_list, deploy_start_date, check_dists, ...)
 }
 \arguments{
-\item{deploy_start_date}{}
+\item{base_folder}{base_folder where files are stored}
+
+\item{file_list}{file list relative to base_folder}
+
+\item{deploy_start_date}{first date of deployment}
 }
 \value{
-
+Returns a data frame with lat/lon for each location and date collected
 }
 \description{
 Extracts out lat/lon locations from gps log files

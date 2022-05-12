@@ -10,7 +10,7 @@ play_random_track(base_folder, random_seed = NULL)
 \item{base_folder}{Base folder path from which to search from.}
 }
 \value{
-Will not return anything.
+Will not return anything. It does open your media player
 }
 \description{
 Will play a random track from a wave file in a given folder.

@@ -15,11 +15,11 @@ getvals(filename, fl, mf = NA, maxf = NA, units_ = "samples")
 
 \item{maxf}{max freqency for complexity}
 
-\item{units_}{}
+\item{units_}{Units for tuneR to read wave file. Defaults to "samples"}
 }
 \value{
-
+Returns a data frame with accoustic indices.
 }
 \description{
-Get accoustic complexity values
+Wrapper for soundecology package
 }

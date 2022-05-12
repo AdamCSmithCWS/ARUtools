@@ -4,12 +4,22 @@
 \alias{clean_metadata}
 \title{Clean aru metadata}
 \usage{
-clean_metadata(type, folder_base, gps_locations = NULL, ...)
+clean_metadata(
+  type,
+  folder_base,
+  included_subfolders = "all",
+  gps_locations = NULL,
+  ...
+)
 }
 \arguments{
 \item{type}{BarLT or SM4}
 
 \item{folder_base}{Folder base directory}
+
+\item{included_subfolders}{Defaults to 'all', which means all subfolders included.
+To include only some folders (at first level only),
+provide a vector with folder names to include.}
 
 \item{gps_locations}{GPS locations in lat/lon format with SiteID
 Must also include timezone (tz) and deploy date.}

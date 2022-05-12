@@ -98,7 +98,51 @@ read_summary_SM4 <- function(filename, SiteID_pattern = "SM4A\\d{5}"){
 
 }
 
+#' Process GPS locations for SongMeters
+#'
+#' @param folder_base Base folder were summary folders locationed
+#' @param list_files List of files in folder_base
+#'
+#' @return Returns a data frame with lat/lon for each location and date collected
+process_gps_SM <- function(folder_base, list_files){
 
+  summText <- list_files[grep("_Summary.txt", list_files)]
+
+  summaries <- purrr::map_df(summText, ~{read.csv(glue::glue("{folder_base}/{.x}")) |>
+      dplyr::mutate(SiteID = stringr::str_extract(.x, site_pattern))}) |>
+    tibble::as_tibble()
+  needed_names <- c("LAT", "LON", "DATE", "TIME")
+  if(!all( needed_names%in% names(summaries))) abort(
+    glue::glue(
+      "Check your summary files. Should include {glue::glue_collapse(needed_names, sep = '; ')}"
+      )
+    )
+
+  gps_locations <- summaries |>
+    # HH/MM,DD/MM/YY
+    mutate(date = lubridate::ymd(DATE),
+           time =  lubridate::hms(TIME),
+           dd_mm_yy = as.character(format(date, "%d/%m%/%Y")),
+           hh_mm = as.character(TIME)) |>
+    dplyr::arrange(SiteID,date,time) |>
+    dplyr::distinct(SiteID, LAT, LON,
+                    .keep_all = T) |>
+    dplyr::select(SiteID,dd_mm_yy, hh_mm, LAT, LON) |>
+    dplyr::mutate(LON = -1*LON) |>
+    sf::st_as_sf(coords = c("LON", "LAT"), crs = 4326) %>%
+    dplyr::bind_cols(
+      tibble::as_tibble(sf::st_coordinates(.))
+    ) |> dplyr::rename(longitude_decimal_degrees=X,
+                       latitude_decimal_degrees=Y) |>
+    sf::st_drop_geometry()
+
+  gps_locations$tz <- lutz::tz_lookup_coords(lat = gps_locations$latitude_decimal_degrees,
+                                             lon = gps_locations$longitude_decimal_degrees,
+                                             method = 'accurate')
+  stopifnot("Multiple time zones detected, please run separately"=
+              length(unique(gps_locations$tz))==1)
+  return(gps_locations)
+}
 
 
 #' Process GPS log file for BarLT
@@ -107,14 +151,11 @@ read_summary_SM4 <- function(filename, SiteID_pattern = "SM4A\\d{5}"){
 #'   will drop locations before a given date, but does
 #'   not drop duplicate locations
 #'
-#' @param base_folder
-#' @param file_list
-#' @param deploy_start_date
+#' @param base_folder base_folder where files are stored
+#' @param file_list  file list relative to base_folder
+#' @param deploy_start_date  first date of deployment
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return Returns a data frame with lat/lon for each location and date collected
 process_gps_barlt <- function(base_folder, file_list, deploy_start_date,check_dists,...){
   crs_m <- 3161
   dist_cutoff <- 100
@@ -165,12 +206,10 @@ process_gps_barlt <- function(base_folder, file_list, deploy_start_date,check_di
 #' Check distances between points from GPS log
 #'
 #' @param gps_log gps log file generated from process_gps_barlt
-#' @param crs_m  CRS for measurment of distances. Should be in meters
+#' @param crs_m  CRS for measurement of distances. Should be in meters
 #' @param dist_cutoff Distance cutoff in meters. Can be set to Inf to avoid this check.
 #'
-#' @return
-#' @export
-#'
+#' @return Returns a data frame with maximum distances between gps points at site.
 check_gps_distances <- function(gps_log, crs_m = 3161, dist_cutoff = 100){
   max_distances <-
   gps_log |>

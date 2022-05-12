@@ -12,13 +12,25 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     dplyr,
+    tibble,
+    tidyr,
+    sf,
+    janitor,
+    purrr,
+    stringr,
+    lubridate,
     patchwork,
+    glue,
     ggplot2,
     rlang (>= 0.4),
     spsurvey (>= 5.0.1),
     lutz,
     suncalc
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    soundecology,
+    withr,
+    job,
+    rstudioapi
 Config/testthat/edition: 3
 RoxygenNote: 7.1.2

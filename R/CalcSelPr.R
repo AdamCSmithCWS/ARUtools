@@ -12,8 +12,6 @@
 #'
 #' @return Returns either a data frame with selection probabilities or plots of selection probabiliies.
 #' @export
-#'
-#' @examples
 gen_dens_sel_simulation <- function( min, mean_min, sd_min, doy, mean_doy, sd_doy, return_dat =F, log_=F, fun = 'norm',
                                      off=NULL ) {
   min_fun <- switch (fun,
@@ -66,8 +64,6 @@ gen_dens_sel_simulation <- function( min, mean_min, sd_min, doy, mean_doy, sd_do
 #'
 #' @return   Returns .data with selection probability columns
 #' @export
-#'
-#' @examples
 calc_sel_pr <- function(.data,ARU_ID_col, min_col, day_col, parms = list(min_range = c(-60, 300),
                                                                          doy_range = c(150, 180),
                                                                          mean_min = 30, sd_min = 30,

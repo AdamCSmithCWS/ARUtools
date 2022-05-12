@@ -16,12 +16,18 @@ soxSpectrogram(
 \arguments{
 \item{file.path}{Input must be file with its directory (file.path)}
 
-\item{out.path}{Defult will save in Spectrogram folder in the current working directory otherwise specify location (out.path)}
+\item{out.path}{Default will save in Spectrogram folder in the current working directory otherwise specify location (out.path)}
 
-\item{sox.file.path}{}
+\item{out.app}{Appends to the start of the output file. Default is 'test'}
+
+\item{size}{Size of picture in pixels}
+
+\item{duration}{Duration of recording to plot}
+
+\item{sox.file.path}{Path to sox file.}
 }
 \value{
-
+Does not return anything, but does create a image file at out.path.
 }
 \description{
 Functions from Sam Hache to create spectrograms
@@ -29,7 +35,7 @@ Functions from Sam Hache to create spectrograms
 \details{
 Create spectrogram and save it wherever you want
 Input must be file with its directory (file.path)
-Defult will save in Spectrogram folder in the current working directory otherwise specify location (out.path)
+Default will save in Spectrogram folder in the current working directory otherwise specify location (out.path)
 Size specifies the x and y size of the output in pixels must be list
 Duration sets the duration of spectrogram default is 3 min and is listed in seconds
 }
