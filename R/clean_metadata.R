@@ -7,10 +7,16 @@
 #'        provide a vector with folder names to include.
 #' @param gps_locations GPS locations in lat/lon format with SiteID
 #'                       Must also include timezone (tz) and deploy date.
+#' @param file_split_pattern Regular expression to split sound file name into pieces.
+#'                      May need to adjust if non-standard naming convention is used.
+#' @param site_pattern  Regular expression to extract site name from folder path
 #'
 #' @return
 #' @export
-clean_metadata <- function(type, folder_base,included_subfolders = 'all',gps_locations = NULL, ... ){
+clean_metadata <- function(type, folder_base,included_subfolders = 'all',gps_locations = NULL,
+                           file_split_pattern = "T|\\-|\\_|\\.",
+                           site_pattern =  "[P|Q]\\d+_\\d",
+                           ... ){
   BarLT <- (grepl("bar", type, ignore.case = T) & grepl("lt", type, ignore.case = T))
   SM <- (grepl("sm", type, ignore.case = T) & grepl("3|4", type, ignore.case = T))
   if(!any(BarLT ,SM) ){
@@ -18,7 +24,6 @@ clean_metadata <- function(type, folder_base,included_subfolders = 'all',gps_loc
   }
   list2env(list(...), envir = environment())
   if(!exists("file_ext")) file_ext <- ".wav"
-  if(!exists("file_split_pattern")) file_split_pattern <- "T|\\-|\\_|\\."
   # browser()
   list_files <- list.files(folder_base, recursive = T, full.names = F, include.dirs = F)
 
@@ -59,7 +64,6 @@ clean_metadata <- function(type, folder_base,included_subfolders = 'all',gps_loc
       lubridate::ymd() %>% { min(.) -2 } |>
       format("%d/%m/%Y") |> lubridate::dmy()
     if(!exists("check_dists")) check_dists <- TRUE
-    if(!exists("site_pattern")) site_pattern <-  "[P|Q]\\d+_\\d"
 
 
     if(is_null(gps_locations)){

@@ -108,8 +108,9 @@ read_summary_SM4 <- function(filename, SiteID_pattern = "SM4A\\d{5}"){
 process_gps_SM <- function(folder_base, list_files, site_pattern){
 
   summText <- list_files[grep("_Summary.txt", list_files)]
-
+  # browser()
   summaries <- purrr::map_df(summText, ~{read.csv(glue::glue("{folder_base}/{.x}")) |>
+      mutate(across(.fns = as.character)) |>
       dplyr::mutate(SiteID = stringr::str_extract(.x, site_pattern))}) |>
     tibble::as_tibble()
   if(any(is.na(summaries$SiteID)))abort("Some SiteID were not parsed. Check SiteID_pattern is correct")
@@ -120,6 +121,7 @@ process_gps_SM <- function(folder_base, list_files, site_pattern){
       )
     )
   # browsers()
+  suppressWarnings(
   gps_locations <- summaries |>
     filter(!is.na(as.numeric(LON) )& !is.na(as.numeric(LAT))) |>
     # HH/MM,DD/MM/YY
@@ -131,15 +133,17 @@ process_gps_SM <- function(folder_base, list_files, site_pattern){
     dplyr::distinct(SiteID, LAT, LON,
                     .keep_all = T) |>
     dplyr::select(SiteID,dd_mm_yy, hh_mm, LAT, LON) |>
-    dplyr::mutate(LON = -1*as.numeric(LON)) |>
+    dplyr::mutate(longitude_decimal_degrees = -1*as.numeric(LON),
+                  latitude_decimal_degrees = as.numeric(LAT)) #|>
+  )
     # sf::st_as_sf(coords = c("LON", "LAT"), crs = 4326) %>%
     # dplyr::bind_cols(
     #   tibble::as_tibble(sf::st_coordinates(.))
     # ) |>
-    dplyr::rename(longitude_decimal_degrees=LON,
-                       latitude_decimal_degrees=LAT)
+    # dplyr::rename(longitude_decimal_degrees=LON,
+    #                    latitude_decimal_degrees=LAT)
     # sf::st_drop_geometry()
-  browser()
+  # browser()
   if(any(gps_locations$latitude_decimal_degrees==0)|any(gps_locations$longitude_decimal_degrees==0)){
     if(
       menu(c("Yes", "No"),
