@@ -10,10 +10,18 @@
 #' @param log_ Logical - to use log of densities (creates softer patterns)
 #' @param fun Function to use for densities. Can be "lognorm", "norm", or "cauchy"
 #'
+#' @import patchwork
+#'
 #' @return Returns either a data frame with selection probabilities or plots of selection probabiliies.
 #' @export
 gen_dens_sel_simulation <- function( min, mean_min, sd_min, doy, mean_doy, sd_doy, return_dat =F, log_=F, fun = 'norm',
                                      off=NULL ) {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop(
+      "Package \"ggplot2\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
   min_fun <- switch (fun,
     "lognorm" = function(x, m, sd, log) dlnorm(x+off,log(m+off), sd, log),
     "norm" = dnorm,
@@ -32,17 +40,17 @@ gen_dens_sel_simulation <- function( min, mean_min, sd_min, doy, mean_doy, sd_do
 
   if(isTRUE(return_dat))(return(all))
 
-  p1 <- ggplot(all, aes(doy, psel_doy)) + geom_line()
-  p2 <- ggplot(all, aes(min, psel_tod)) + geom_line()
-  p3 <- ggplot(all,
+  p1 <- ggplot2::ggplot(all, aes(doy, psel_doy)) + geom_line()
+  p2 <- ggplot2::ggplot(all, aes(min, psel_tod)) + geom_line()
+  p3 <- ggplot2::ggplot(all,
                aes(doy,
                    min,
                    fill =
                      psel_scaled
                )
   ) +
-    geom_tile() +
-    scale_fill_viridis_c()
+    ggplot2::geom_tile() +
+    ggplot2::scale_fill_viridis_c()
 
 
   (p1 + p2) / p3

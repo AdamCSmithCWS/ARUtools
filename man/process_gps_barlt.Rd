@@ -4,7 +4,14 @@
 \alias{process_gps_barlt}
 \title{Process GPS log file for BarLT}
 \usage{
-process_gps_barlt(base_folder, file_list, deploy_start_date, check_dists, ...)
+process_gps_barlt(
+  base_folder,
+  file_list,
+  deploy_start_date,
+  check_dists,
+  site_pattern,
+  ...
+)
 }
 \arguments{
 \item{base_folder}{base_folder where files are stored}

@@ -50,10 +50,10 @@ read_log_barlt <- function(filename){
 
   dated_logs <- full_file[grepl("^\\d\\d\\/", full_file)] |>
     stringr::str_remove("\xffffffb0") |>
-    stringr::str_conv("UTF-8") |>
-    tibble::tibble(row = _ ) |>
+    stringr::str_conv("UTF-8") %>%
+    tibble::tibble(row = . ) |>
     tidyr::separate(col = row, into = c("Date", "Time", "Log"),
-                    sep = c(10,20)) |>
+                    sep = c(10,20), extra = 'merge') |>
     mutate(filename = filename,
            serial = serial,
            firmware = firmware)
@@ -83,12 +83,12 @@ read_summary_SM4 <- function(filename, SiteID_pattern = "SM4A\\d{5}"){
   out <- purrr::map_df(summText, ~{read.csv(.x) |>
       dplyr::mutate(SiteID = stringr::str_extract(.x, SiteID_pattern))})
 
-  if(any(is.na(out$SiteID))) warn("Some SiteID were not parsed. Check SiteID_pattern is correct")
+  if(any(is.na(out$SiteID))) abort("Some SiteID were not parsed. Check SiteID_pattern is correct")
   }
   if(length(filename)==1){
     out <- read.csv(filename) |>
              dplyr::mutate(SiteID = stringr::str_extract(.x, SiteID_pattern))
-    if(any(is.na(out$SiteID))) warn("Some SiteID were not parsed. Check SiteID_pattern is correct")
+    if(any(is.na(out$SiteID))) abort("Some SiteID were not parsed. Check SiteID_pattern is correct")
 
   }
 
@@ -102,23 +102,26 @@ read_summary_SM4 <- function(filename, SiteID_pattern = "SM4A\\d{5}"){
 #'
 #' @param folder_base Base folder were summary folders locationed
 #' @param list_files List of files in folder_base
+#' @param site_pattern site pattern to separate out siteid
 #'
 #' @return Returns a data frame with lat/lon for each location and date collected
-process_gps_SM <- function(folder_base, list_files){
+process_gps_SM <- function(folder_base, list_files, site_pattern){
 
   summText <- list_files[grep("_Summary.txt", list_files)]
 
   summaries <- purrr::map_df(summText, ~{read.csv(glue::glue("{folder_base}/{.x}")) |>
       dplyr::mutate(SiteID = stringr::str_extract(.x, site_pattern))}) |>
     tibble::as_tibble()
+  if(any(is.na(summaries$SiteID)))abort("Some SiteID were not parsed. Check SiteID_pattern is correct")
   needed_names <- c("LAT", "LON", "DATE", "TIME")
   if(!all( needed_names%in% names(summaries))) abort(
     glue::glue(
       "Check your summary files. Should include {glue::glue_collapse(needed_names, sep = '; ')}"
       )
     )
-
+  # browsers()
   gps_locations <- summaries |>
+    filter(!is.na(as.numeric(LON) )& !is.na(as.numeric(LAT))) |>
     # HH/MM,DD/MM/YY
     mutate(date = lubridate::ymd(DATE),
            time =  lubridate::hms(TIME),
@@ -128,13 +131,24 @@ process_gps_SM <- function(folder_base, list_files){
     dplyr::distinct(SiteID, LAT, LON,
                     .keep_all = T) |>
     dplyr::select(SiteID,dd_mm_yy, hh_mm, LAT, LON) |>
-    dplyr::mutate(LON = -1*LON) |>
-    sf::st_as_sf(coords = c("LON", "LAT"), crs = 4326) %>%
-    dplyr::bind_cols(
-      tibble::as_tibble(sf::st_coordinates(.))
-    ) |> dplyr::rename(longitude_decimal_degrees=X,
-                       latitude_decimal_degrees=Y) |>
-    sf::st_drop_geometry()
+    dplyr::mutate(LON = -1*as.numeric(LON)) |>
+    # sf::st_as_sf(coords = c("LON", "LAT"), crs = 4326) %>%
+    # dplyr::bind_cols(
+    #   tibble::as_tibble(sf::st_coordinates(.))
+    # ) |>
+    dplyr::rename(longitude_decimal_degrees=LON,
+                       latitude_decimal_degrees=LAT)
+    # sf::st_drop_geometry()
+  browser()
+  if(any(gps_locations$latitude_decimal_degrees==0)|any(gps_locations$longitude_decimal_degrees==0)){
+    if(
+      menu(c("Yes", "No"),
+           title =
+           "Lat or Lon detected as zero.\nThis can occur if not set in Song Meters.
+           \nTime to sunrise/sunset will be incorrect (unless you are deploying at 0,0).
+           \nDo you want to continue?"
+           )==2) abort(c("Latitude or longides invalid. It is reccomend you provide lat/lon manually"))
+  }
 
   gps_locations$tz <- lutz::tz_lookup_coords(lat = gps_locations$latitude_decimal_degrees,
                                              lon = gps_locations$longitude_decimal_degrees,
@@ -156,18 +170,33 @@ process_gps_SM <- function(folder_base, list_files){
 #' @param deploy_start_date  first date of deployment
 #'
 #' @return Returns a data frame with lat/lon for each location and date collected
-process_gps_barlt <- function(base_folder, file_list, deploy_start_date,check_dists,...){
+process_gps_barlt <- function(base_folder, file_list, deploy_start_date,check_dists,site_pattern,...){
   crs_m <- 3161
   dist_cutoff <- 100
   list2env(list(...), environment())
-  gps_log_full <- purrr::map_df(glue::glue("{base_folder}/{file_list[grepl('GPS', file_list)]}"),
+  # browser()
+  gps_files <- glue::glue("{base_folder}/{file_list[grepl('GPS', file_list)]}")
+  folder_gps <- stringr::str_remove(gps_files, base_folder)
+  n_fold <- stringr::str_split(folder_gps, "/") |> purrr::map_dbl(length) |> unique()
+  stopifnot(length(n_fold)==1)
+  gps_log_full <- purrr::map_df(gps_files,
     ~{readr::read_csv(.x,skip = 1, col_names = T, col_types = readr::cols()) |>
     janitor::clean_names() |> mutate(filepath = .x)}) |>
-    mutate(dd_mm_yy = lubridate::dmy(dd_mm_yy)) |>
-    tidyr::separate(filepath, remove=F, sep = paste0(base_folder), into = c("dropme", "Other")) |>
-    tidyr::separate(Other, into =c("dropme2", "SiteID", "Filename"), sep = "/") |>
-    dplyr::select(-dropme, -dropme2) |> filter(dd_mm_yy >= deploy_start_date)
-
+    mutate(dd_mm_yy_raw = dd_mm_yy,
+      dd_mm_yy = lubridate::dmy(dd_mm_yy),
+      SiteID = stringr::str_extract(filepath, site_pattern)) |>
+    tidyr::separate(filepath, remove=F, sep = paste0(base_folder), into = c("dropme", "Other"), extra = 'merge') |>
+    tidyr::separate(Other, into =c("dropme2",
+                                   glue::glue( "Folder_{1:(n_fold-2)}"),
+                                   "Filename"), sep = "/", extra = 'merge') |>
+    # Placeholder to drop empty columns. For now it drops date columns also
+    # dplyr::select_if(
+    #     ~!(all(is.na(.x))||all(.x == ""))
+    #
+    # ) |>
+    dplyr::select(-matches("^dropme")) |>
+    dplyr::filter(dd_mm_yy >= deploy_start_date)
+  if(any(is.na(gps_log_full$SiteID)))abort("Some SiteID were not parsed from GPS log. Check SiteID_pattern is correct")
   tz_loc <- lutz::tz_lookup_coords(lat = gps_log_full$latitude_decimal_degrees,
                                    lon = gps_log_full$longitude_decimal_degrees,
                                    method = 'accurate')
@@ -222,7 +251,7 @@ check_gps_distances <- function(gps_log, crs_m = 3161, dist_cutoff = 100){
               .groups = 'drop') |>
     sf::st_drop_geometry()
 
-  if(any(max_distances$max_dist>units::set_units(dist_cutoff, "m")))
+  if(any(max_distances$max_dist>units::set_units(dist_cutoff, "m"))) #browser()
     abort(c("Within Site distance is greater than cuttoff",
             "x" = "Distance must be less than `dist_cutoff`",
             "i" = "Set dist_cutoff to Inf to avoid this (e.g. moving ARU)"))

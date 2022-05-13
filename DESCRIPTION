@@ -21,7 +21,6 @@ Imports:
     lubridate,
     patchwork,
     glue,
-    ggplot2,
     rlang (>= 0.4),
     spsurvey (>= 5.0.1),
     lutz,
@@ -29,6 +28,8 @@ Imports:
 Suggests: 
     testthat (>= 3.0.0),
     soundecology,
+    ggplot2,
+    patchwork,
     withr,
     job,
     rstudioapi

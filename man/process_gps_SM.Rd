@@ -4,12 +4,14 @@
 \alias{process_gps_SM}
 \title{Process GPS locations for SongMeters}
 \usage{
-process_gps_SM(folder_base, list_files)
+process_gps_SM(folder_base, list_files, site_pattern)
 }
 \arguments{
 \item{folder_base}{Base folder were summary folders locationed}
 
 \item{list_files}{List of files in folder_base}
+
+\item{site_pattern}{site pattern to separate out siteid}
 }
 \value{
 Returns a data frame with lat/lon for each location and date collected

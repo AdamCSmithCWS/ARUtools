@@ -11,14 +11,19 @@
 #' @return
 #' @export
 clean_metadata <- function(type, folder_base,included_subfolders = 'all',gps_locations = NULL, ... ){
+  BarLT <- (grepl("bar", type, ignore.case = T) & grepl("lt", type, ignore.case = T))
+  SM <- (grepl("sm", type, ignore.case = T) & grepl("3|4", type, ignore.case = T))
+  if(!any(BarLT ,SM) ){
+    abort("Currently only BarLT and SM4 ARUs are supported. Will add more as needed.")
+  }
   list2env(list(...), envir = environment())
   if(!exists("file_ext")) file_ext <- ".wav"
   if(!exists("file_split_pattern")) file_split_pattern <- "T|\\-|\\_|\\."
+  # browser()
   list_files <- list.files(folder_base, recursive = T, full.names = F, include.dirs = F)
 
-  if(included_subfolders!="all") {
-    list_folders[list_folders %in% included_subfolders]
-     list_files <- purrr::map(glue::glue("^{included_subfolders}/"),
+  if(!any(grepl("all", included_subfolders)) | length(included_subfolders)>1) {
+     list_files <- purrr::map(glue::glue("{included_subfolders}/"),
                                         ~list_files[grepl(.x, list_files)]) |>
        unlist()
      if(length(list_files)==0){
@@ -40,7 +45,7 @@ clean_metadata <- function(type, folder_base,included_subfolders = 'all',gps_loc
   #   } else abort("Tried 'Wav' and 'Data' as folder separators. Please use your own using folder_sep argument")
   # }
   # |- BarLT   ----------------
-  if(grepl("bar", type, ignore.case = T) & grepl("lt", type, ignore.case = T)){
+  if(BarLT){
 
     log_files <- list_files[grep("logfile", list_files)]
     log_data <- purrr::map(glue::glue("{folder_base}/{log_files}"), read_log_barlt) |>
@@ -58,8 +63,10 @@ clean_metadata <- function(type, folder_base,included_subfolders = 'all',gps_loc
 
 
     if(is_null(gps_locations)){
+      if(!exists("dist_cutoff")) dist_cutoff <- 100
       gps_locations <- process_gps_barlt(base_folder = folder_base,
-                      file_list= list_files,
+                                         site_pattern = site_pattern,
+                      file_list= list_files,dist_cutoff=dist_cutoff,
                       deploy_start_date = deploy_start_date,
                       check_dists)
     }
@@ -67,7 +74,8 @@ clean_metadata <- function(type, folder_base,included_subfolders = 'all',gps_loc
 
   }
   # |- SM4   ----------------
-  if(grepl("sm", type, ignore.case = T) & grepl("4", type, ignore.case = T)){
+  if(SM){
+    if(grepl("3", type)) warn("Default site_pattern is set for SM4. Recommend changing based on file structure")
     if(!exists("site_pattern")) site_pattern <-  "S4A\\d{5}"
     # file.location <- "//WRIV02DTSTDNT1/RecordStor20172019/BetweenRivers_2019"
 
@@ -76,11 +84,12 @@ clean_metadata <- function(type, folder_base,included_subfolders = 'all',gps_loc
 
 
     if(is_null(gps_locations)){
-      gps_locations <- process_gps_SM(summaries)
+      gps_locations <- process_gps_SM(folder_base = folder_base, list_files = list_files,
+                                      site_pattern = site_pattern)
     }
     if(!exists("site_in_filename")) site_in_filename <- TRUE
   }
-
+    # if(length(unique(gps_locations$tz ))>1) browser()
     wav_names_log <- parse_datetimes(list_waves,filename_separator = file_split_pattern,
                                            site_in_filename = site_in_filename,
                                            site_pattern =site_pattern,
@@ -90,9 +99,9 @@ clean_metadata <- function(type, folder_base,included_subfolders = 'all',gps_loc
                                             wav_names_log = wav_names_log)
 
 
-  if(!type %in% c("BarLT","SM4")){
-    simpleError("Currently only BarLT and SM4 ARUs are supported. Will add more as needed.")
-  }
+
+
+    return(rec_log_ss)
 
 
 }
