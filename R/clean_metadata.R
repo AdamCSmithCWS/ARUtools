@@ -9,7 +9,7 @@
 #'                       Must also include timezone (tz) and deploy date.
 #' @param file_split_pattern Regular expression to split sound file name into pieces.
 #'                      May need to adjust if non-standard naming convention is used.
-#' @param site_pattern  Regular expression to extract site name from folder path
+#' @param site_pattern  Regular expression to extract site name from folder path.
 #'
 #' @return
 #' @export
