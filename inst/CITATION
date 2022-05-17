@@ -1,0 +1,11 @@
+citHeader("To cite ARUtools in publications use:")
+
+citEntry(
+  entry    = "ARUtools",
+  title    = "ARUtools: a package for ARU data",
+  author   = "David Hope",
+  url      = ,
+  textVersion = paste(
+
+  )
+)

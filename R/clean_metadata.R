@@ -103,6 +103,7 @@ clean_metadata <- function(type, folder_base,included_subfolders = 'all',gps_loc
                                             wav_names_log = wav_names_log)
 
 
+    browser()
 
 
     return(rec_log_ss)
