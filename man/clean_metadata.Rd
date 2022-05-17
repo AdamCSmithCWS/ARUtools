@@ -9,6 +9,8 @@ clean_metadata(
   folder_base,
   included_subfolders = "all",
   gps_locations = NULL,
+  file_split_pattern = "T|\\\\-|\\\\_|\\\\.",
+  site_pattern = "[P|Q]\\\\d+_\\\\d",
   ...
 )
 }
@@ -23,6 +25,11 @@ provide a vector with folder names to include.}
 
 \item{gps_locations}{GPS locations in lat/lon format with SiteID
 Must also include timezone (tz) and deploy date.}
+
+\item{file_split_pattern}{Regular expression to split sound file name into pieces.
+May need to adjust if non-standard naming convention is used.}
+
+\item{site_pattern}{Regular expression to extract site name from folder path.}
 }
 \value{
 
