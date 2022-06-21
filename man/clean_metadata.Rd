@@ -30,9 +30,13 @@ Must also include timezone (tz) and deploy date.}
 May need to adjust if non-standard naming convention is used.}
 
 \item{site_pattern}{Regular expression to extract site name from folder path.}
-}
-\value{
 
+\item{...}{Extra parameters for devleopment. Currently works with:
+- file_ext: default is '.wav'
+- site_in_filename: Logical: default is FALSE
+- deploy_start_date:  default is 2 days before first recording (dmy format)
+- check_dists: Logical to check distances from GPS within site. Default is TRUE
+- dist_cutoff: Cutoff to raise error in distance check. Default is 100 (in meters).}
 }
 \description{
 Clean aru metadata

@@ -6,7 +6,6 @@
 #' @name ARUtools
 #' @import spsurvey
 #' @import patchwork
-#' @import ggplot2
 #' @import rlang
 #' @import dplyr
 #' @importFrom magrittr %>%

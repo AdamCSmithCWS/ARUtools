@@ -4,8 +4,8 @@ citEntry(
   entry    = "ARUtools",
   title    = "ARUtools: a package for ARU data",
   author   = "David Hope",
-  url      = ,
+  url      = "www.github.com/dhope/ARUtools",
   textVersion = paste(
-
+  Hope, David. ARUtools: a package for ARU data. www.github.com/dhope/ARUtools
   )
 )

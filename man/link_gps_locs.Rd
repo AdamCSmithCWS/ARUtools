@@ -11,9 +11,6 @@ link_gps_locs(gps_locations, wav_names_log)
 
 \item{wav_names_log}{wav list}
 }
-\value{
-
-}
 \description{
 Link GPS locations with wav files
 }

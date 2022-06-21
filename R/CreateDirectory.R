@@ -8,6 +8,7 @@
 #' @export
 #'
 create_directory_structure <- function(hexagons, units, base_dir){
+  if(!is_interactive()) abort("This function must be run in interactive session.")
   yn <- menu(c("Yes", "No"),
              title = glue::glue("Current function will create {length(hexagons)} directories in {base_dir}\n
                                 Do you want to continue?"))
@@ -18,8 +19,10 @@ create_directory_structure <- function(hexagons, units, base_dir){
     for(j in sites)  dir.create(glue::glue("{base_dir}/{i}/{j}"))
   }
 
-  sink(glue::glue("{base_dir}/session_info.md"))
-  print(sessioninfo::session_info())
-  sink()
+  if (rlang::is_installed("sessioninfo")) {
+  readr::write_lines(sessioninfo::session_info(), glue::glue("{base_dir}/session_info.md"))
+  } else{ readr::write_lines(sessionInfo(), glue::glue("{base_dir}/session_info.md"))}
+  # print(sessioninfo::session_info())
+  # sink()
 
 }

@@ -8,12 +8,15 @@
 #' @param maxf max freqency for complexity
 #' @param units_ Units for tuneR to read wave file. Defaults to "samples"
 #'
-#' @import soundecology
-#' @import tuneR
-#'
 #' @return Returns a data frame with accoustic indices.
 #' @export
 getvals <- function(filename,fl , mf = NA, maxf = NA, units_ = "samples") {
+  if (!requireNamespace("pkg", quietly = TRUE)) {
+    stop(
+      "Packages \"soundecology\" and \"tuneR\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
   cat(glue::glue("Running file named {filename}\n"))
   file_location <- ifelse(fl=="", filename, glue::glue("{fl}/{filename}"))
   wave_ex <- tuneR::readWave(file_location, units = units_)

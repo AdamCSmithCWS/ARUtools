@@ -9,9 +9,6 @@ read_log_barlt(filename)
 \arguments{
 \item{filename}{Character. File location of log file}
 }
-\value{
-
-}
 \description{
 Returns the serial number, firware version
 and log file parsed as a tibble.
