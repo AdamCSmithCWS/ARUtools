@@ -20,7 +20,7 @@
 #' @return
 #' @export
 clean_metadata <- function(type, folder_base,included_subfolders = 'all',gps_locations = NULL,
-                           file_split_pattern = "T|\\-|\\_|\\.",
+                           file_split_pattern = "T|\\-|\\_|\\.|a",
                            site_pattern =  "[P|Q]\\d+_\\d",
                            ... ){
   BarLT <- (grepl("bar", type, ignore.case = T) & grepl("lt", type, ignore.case = T))
